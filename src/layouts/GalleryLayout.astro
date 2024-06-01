@@ -1,0 +1,14 @@
+---
+import { ViewTransitions } from "astro:transitions";
+import Navbar from "../components/Navbar.astro";
+import MainLayout from "./MainLayout.astro";
+---
+<MainLayout transition:animate="none">
+	<div class="md:container mx-auto">
+		<Navbar />
+		<aside transition:animate="fade">
+			<slot />
+		</aside>
+	</div>
+</MainLayout>
+<ViewTransitions />

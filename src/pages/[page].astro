@@ -1,0 +1,17 @@
+---
+import Gallery from "../components/Gallery.astro";
+import { getCollection } from "astro:content";
+import GalleryLayout from "../layouts/GalleryLayout.astro";
+
+export async function getStaticPaths({ paginate }: { paginate: any }) {
+	const images = await getCollection("images");
+	return paginate(
+		images.sort((i1, i2) => i2.data.date.getTime() - i1.data.date.getTime()),
+		{pageSize: 20});
+}
+
+const { page } = Astro.props as any;
+---
+<GalleryLayout>
+	<Gallery page={page}></Gallery>
+</GalleryLayout>

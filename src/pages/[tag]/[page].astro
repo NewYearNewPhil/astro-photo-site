@@ -1,0 +1,37 @@
+---
+import { getCollection } from "astro:content";
+import Gallery from "../../components/Gallery.astro";
+import GalleryLayout from "../../layouts/GalleryLayout.astro";
+
+export async function getStaticPaths({ paginate }: { paginate: any }) {
+	const images = await getCollection("images");
+	const tags = images.reduce((acc: any, image) => {
+    image.data.tags?.forEach((tag) => {
+        if (!acc.includes(tag)) {
+            acc.push(tag);
+        }
+    });
+    return acc;
+}, []);
+	return tags.flatMap((tag: string) => {
+		const filteredImages = images.filter((image) =>
+			image.data.tags?.includes(tag),
+		);
+		return paginate(
+			filteredImages.sort(
+				(i1, i2) => i2.data.date.getTime() - i1.data.date.getTime(),
+			),
+			{
+				params: { tag },
+				pageSize: 20,
+			},
+		);
+	});
+}
+
+const { page } = Astro.props as any;
+---
+
+<GalleryLayout>
+	<Gallery page={page} />
+</GalleryLayout>

@@ -1,0 +1,38 @@
+---
+import { getCollection } from "astro:content";
+
+const images = await getCollection("images");
+const tags = images.reduce((acc: any, image) => {
+    image.data.tags?.forEach((tag) => {
+        if (!acc.includes(tag)) {
+            acc.push(tag);
+        }
+    });
+    return acc;
+}, []);
+---
+<div class="h-72 -mb-56">
+    <div class="navbar px-5 sticky top-0 h-16 bg-base-100/50 z-50">
+        <div class="flex-1">
+            <a href="/" class="btn btn-ghost text-xl">Astro Photo Showcase</a>
+        </div>
+        <div class="flex-none">
+            <ul class="menu menu-horizontal px-0">
+                <li>
+                    <details class="dropdown dropdown-end">
+                        <summary> Tags </summary>
+                        <ul class="dropdown-content bg-base-100 rounded">
+                            {
+                                tags.map((tag: unknown) => (
+                                    <li>
+                                        <a href={`/${tag}/1/`}>{tag}</a>
+                                    </li>
+                                ))
+                            }
+                        </ul>
+                    </details>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
