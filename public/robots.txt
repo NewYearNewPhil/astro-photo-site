@@ -40,5 +40,3 @@ User-agent: scoop.it
 User-agent: Seekr
 User-agent: YouBot
 Disallow: /
-
-Sitemap: https://nynp.dev/sitemap-index.xml
