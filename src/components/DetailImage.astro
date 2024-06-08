@@ -36,11 +36,16 @@ const { image, prevImage, nextImage } = Astro.props as any;
     </div>
 </div>
 
-<script is:inline define:vars={{ prevImage, nextImage }}>
+<script is:inline data-astro-rerun define:vars={{ prevImage, nextImage }}>
     // changed from https://stackoverflow.com/a/23230280
 
-    document.addEventListener("touchstart", handleTouchStart, false);
-    document.addEventListener("touchmove", handleTouchMove, false);
+    document.addEventListener("touchstart", handleTouchStart, true);
+    document.addEventListener("touchmove", handleTouchMove, true);
+
+    document.addEventListener("astro:before-swap", evt => {
+        document.removeEventListener("touchstart", handleTouchStart, true);
+        document.removeEventListener("touchmove", handleTouchMove, true);
+    })
 
     let xDown = undefined;
     let yDown = undefined;
