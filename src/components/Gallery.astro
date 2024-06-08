@@ -5,12 +5,12 @@ const { page } = Astro.props as any;
 const images = page.data;
 ---
 
-<div class="w-full -ml-[0px] -mr-[20px]">
+<div class="w-full -ml-[0px] -mr-[20px] mb-20">
 	<div class="w-full magic-grid">
 		{
 			images.map((image: any) => (
 				<div class="magic-grid-item">
-					<a href={`/image/${image.slug}/`}>
+					<a href={`../${image.slug}/`}>
 						<Image
 							widths={[360, 720, 1024, 1920]}
 							sizes="(max-width: 360px) 360px, (max-width: 720px) 720px, (max-width: 1024px) 1024px, (max-width: 1920px) 1920px"
@@ -22,29 +22,29 @@ const images = page.data;
 			))
 		}
 	</div>
-	<div class="sticky bottom-0 h-16 -mb-56 flex justify-center w-full my-8">
-		<div transition:animate="none" class="join">
-			{
-				page.currentPage > 1 && (
-					<a
-						href={page.url.prev}
-					>
-						<button class="join-item btn">«</button>
-					</a>
-				)
-			}
-			<button class="join-item btn">Seite {page.currentPage}</button>
-			{
-				page.currentPage != page.lastPage && (
-					<a
-					href={page.url.next}
-					>
-						{" "}
-						<button class="join-item btn">»</button>
-					</a>
-				)
-			}
-		</div>
+</div>
+<div class="fixed bottom-4 left-0 right-0 flex justify-center w-full">
+	<div transition:animate="none" class="join bg-base-200">
+		{
+			page.currentPage > 1 && (
+				<a
+					href={page.url.prev}
+				>
+					<button class="join-item btn">«</button>
+				</a>
+			)
+		}
+		<button class="join-item btn">Seite {page.currentPage}</button>
+		{
+			page.currentPage != page.lastPage && (
+				<a
+				href={page.url.next}
+				>
+					{" "}
+					<button class="join-item btn">»</button>
+				</a>
+			)
+		}
 	</div>
 </div>
 

@@ -1,0 +1,48 @@
+---
+import { getCollection } from "astro:content";
+import { ViewTransitions } from "astro:transitions";
+import MainLayout from "../../layouts/MainLayout.astro";
+import DetailImage from "../../components/DetailImage.astro";
+
+export async function getStaticPaths({ paginate }: { paginate: any }) {
+	const images = await getCollection("images");
+	const tags = images.reduce((acc: any, image) => {
+		image.data.tags?.forEach((tag) => {
+			if (!acc.includes(tag)) {
+				acc.push(tag);
+			}
+		});
+		return acc;
+	}, []);
+	return tags.flatMap((tag: string) => {
+		const filteredImages = images.filter((image) =>
+			image.data.tags?.includes(tag),
+		);
+
+		return filteredImages.map((entry) => ({
+			params: { image: entry.slug, tag: tag },
+			props: { entry },
+		}));
+	});
+}
+
+const { entry } = Astro.props;
+const { image, tag } = Astro.params;
+
+const images = await getCollection("images");
+const filteredImages = images.filter((image) => image.data.tags?.includes(tag));
+const ownIndex = filteredImages.findIndex((i) => image === i.slug);
+
+let prevImage, nextImage;
+if (ownIndex > 0) {
+	prevImage = filteredImages[ownIndex - 1];
+}
+if (ownIndex < images.length) {
+	nextImage = filteredImages[ownIndex + 1];
+}
+---
+
+<MainLayout transition:animate="none">
+	<ViewTransitions />
+	<DetailImage image={entry} prevImage={prevImage} nextImage={nextImage} />
+</MainLayout>

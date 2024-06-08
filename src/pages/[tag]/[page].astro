@@ -23,7 +23,7 @@ export async function getStaticPaths({ paginate }: { paginate: any }) {
 			),
 			{
 				params: { tag },
-				pageSize: 10,
+				pageSize: import.meta.env.PUBLIC_IMAGES_PER_PAGE,
 			},
 		);
 	});

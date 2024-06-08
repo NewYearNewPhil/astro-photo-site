@@ -7,7 +7,7 @@ export async function getStaticPaths({ paginate }: { paginate: any }) {
 	const images = await getCollection("images");
 	return paginate(
 		images.sort((i1, i2) => i2.data.date.getTime() - i1.data.date.getTime()),
-		{pageSize: 10});
+		{pageSize: import.meta.env.PUBLIC_IMAGES_PER_PAGE});
 }
 
 const { page } = Astro.props as any;
