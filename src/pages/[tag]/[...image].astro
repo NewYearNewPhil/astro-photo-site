@@ -4,7 +4,7 @@ import { ViewTransitions } from "astro:transitions";
 import MainLayout from "../../layouts/MainLayout.astro";
 import DetailImage from "../../components/DetailImage.astro";
 
-export async function getStaticPaths({ paginate }: { paginate: any }) {
+export async function getStaticPaths() {
 	const images = await getCollection("images");
 	const tags = images.reduce((acc: any, image) => {
 		image.data.tags?.forEach((tag) => {

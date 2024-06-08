@@ -15,7 +15,7 @@ const { image, prevImage, nextImage } = Astro.props as any;
         src={image.data.src}
         alt={image.data.title}
     />
-    <div class="absolute bottom-4 flex justify-center w-full">
+    <div class="fixed bottom-4 flex justify-center w-full">
         <div transition:animate="none" class="join bg-base-200">
             {
                 prevImage && (
@@ -35,3 +35,48 @@ const { image, prevImage, nextImage } = Astro.props as any;
         </div>
     </div>
 </div>
+
+<script is:inline define:vars={{ prevImage, nextImage }}>
+    // changed from https://stackoverflow.com/a/23230280
+
+    document.addEventListener("touchstart", handleTouchStart, false);
+    document.addEventListener("touchmove", handleTouchMove, false);
+
+    let xDown = undefined;
+    let yDown = undefined;
+
+    function handleTouchStart(evt) {
+        const firstTouch = evt.touches[0];
+        xDown = firstTouch.clientX;
+        yDown = firstTouch.clientY;
+    }
+
+    function handleTouchMove(evt) {
+        if (!xDown || !yDown) {
+            return;
+        }
+
+        var xUp = evt.touches[0].clientX;
+        var yUp = evt.touches[0].clientY;
+
+        var xDiff = xDown - xUp;
+        var yDiff = yDown - yUp;
+
+        if (Math.abs(xDiff) > Math.abs(yDiff)) {
+            if (xDiff > 0) {
+                /* right swipe */
+                if (nextImage) {
+                    window.location.assign(`../${nextImage.slug}/`);
+                }
+            } else {
+                /* left swipe */
+                if (prevImage) {
+                    window.location.assign(`../${prevImage.slug}/`);
+                }
+            }
+        }
+
+        xDown = undefined;
+        yDown = undefined;
+    }
+</script>
