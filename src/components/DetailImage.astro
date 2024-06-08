@@ -10,8 +10,8 @@ const { image, prevImage, nextImage } = Astro.props as any;
 >
     <Image
         class="max-w-screen max-h-screen w-auto h-auto absolute"
-        widths={[360, 720, 1024, 1920]}
-        sizes="(max-width: 360px) 360px, (max-width: 720px) 720px, (max-width: 1024px) 1024px, (max-width: 1920px) 1920px"
+        widths={[120, 240, 360, 720, 1024, 1920]}
+        sizes="(max-width: 120px) 120px, (max-width: 240px) 240px, (max-width: 360px) 360px, (max-width: 720px) 720px, (max-width: 1024px) 1024px, (max-width: 1920px) 1920px"
         src={image.data.src}
         alt={image.data.title}
     />
@@ -19,7 +19,11 @@ const { image, prevImage, nextImage } = Astro.props as any;
         <div transition:animate="none" class="join bg-base-200">
             {
                 prevImage && (
-                    <a href={`../${prevImage.slug}/`}>
+                    <a
+                        id="prevImage"
+                        href={`../${prevImage.slug}/`}
+                        data-astro-history="replace"
+                    >
                         <button class="join-item btn">«</button>
                     </a>
                 )
@@ -27,7 +31,11 @@ const { image, prevImage, nextImage } = Astro.props as any;
             <button class="join-item btn">{image.data.title}</button>
             {
                 nextImage && (
-                    <a href={`../${nextImage.slug}/`}>
+                    <a
+                        id="nextImage"
+                        href={`../${nextImage.slug}/`}
+                        data-astro-history="replace"
+                    >
                         <button class="join-item btn">»</button>
                     </a>
                 )
@@ -35,28 +43,23 @@ const { image, prevImage, nextImage } = Astro.props as any;
         </div>
     </div>
 </div>
-
-<script is:inline data-astro-rerun define:vars={{ prevImage, nextImage }}>
+<script>
+    import { navigate } from "astro:transitions/client";
     // changed from https://stackoverflow.com/a/23230280
 
-    document.addEventListener("touchstart", handleTouchStart, true);
-    document.addEventListener("touchmove", handleTouchMove, true);
+    document.addEventListener("touchstart", handleTouchStart, false);
+    document.addEventListener("touchmove", handleTouchMove, false);
 
-    document.addEventListener("astro:before-swap", evt => {
-        document.removeEventListener("touchstart", handleTouchStart, true);
-        document.removeEventListener("touchmove", handleTouchMove, true);
-    })
+    let xDown: number | undefined = undefined;
+    let yDown: number | undefined = undefined;
 
-    let xDown = undefined;
-    let yDown = undefined;
-
-    function handleTouchStart(evt) {
+    function handleTouchStart(evt: TouchEvent) {
         const firstTouch = evt.touches[0];
         xDown = firstTouch.clientX;
         yDown = firstTouch.clientY;
     }
 
-    function handleTouchMove(evt) {
+    function handleTouchMove(evt: TouchEvent) {
         if (!xDown || !yDown) {
             return;
         }
@@ -70,13 +73,19 @@ const { image, prevImage, nextImage } = Astro.props as any;
         if (Math.abs(xDiff) > Math.abs(yDiff)) {
             if (xDiff > 0) {
                 /* right swipe */
+                const nextImage = document.querySelector(
+                    "#nextImage",
+                ) as HTMLAnchorElement | null;
                 if (nextImage) {
-                    window.location.assign(`../${nextImage.slug}/`);
+                    navigate(nextImage.href, { history: "replace" });
                 }
             } else {
                 /* left swipe */
+                const prevImage = document.querySelector(
+                    "#prevImage",
+                ) as HTMLAnchorElement | null;
                 if (prevImage) {
-                    window.location.assign(`../${prevImage.slug}/`);
+                    navigate(prevImage.href, { history: "replace" });
                 }
             }
         }
