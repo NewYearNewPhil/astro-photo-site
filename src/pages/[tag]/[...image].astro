@@ -30,7 +30,7 @@ const { entry } = Astro.props;
 const { image, tag } = Astro.params;
 
 const images = await getCollection("images");
-const filteredImages = images.filter((image) => image.data.tags?.includes(tag));
+const filteredImages = images.filter((image) => image.data.tags?.map(tag => tag.toLowerCase()).includes(tag));
 const ownIndex = filteredImages.findIndex((i) => image === i.slug);
 
 let prevImage, nextImage;
