@@ -23,9 +23,9 @@ const tags = images.reduce((acc: any, image) => {
                         <summary> Tags </summary>
                         <ul class="dropdown-content bg-base-100 rounded">
                             {
-                                tags.map((tag: unknown) => (
+                                tags.map((tag: string) => (
                                     <li>
-                                        <a href={`/${tag}/1/`}>{tag}</a>
+                                        <a href={`/${tag.toLowerCase()}/1/`}>{tag}</a>
                                     </li>
                                 ))
                             }

@@ -8,15 +8,15 @@ export async function getStaticPaths() {
 	const images = await getCollection("images");
 	const tags = images.reduce((acc: any, image) => {
 		image.data.tags?.forEach((tag) => {
-			if (!acc.includes(tag)) {
-				acc.push(tag);
+			if (!acc.includes(tag.toLowerCase())) {
+				acc.push(tag.toLowerCase());
 			}
 		});
 		return acc;
 	}, []);
 	return tags.flatMap((tag: string) => {
 		const filteredImages = images.filter((image) =>
-			image.data.tags?.includes(tag),
+			image.data.tags?.map(tag => tag.toLowerCase()).includes(tag),
 		);
 
 		return filteredImages.map((entry) => ({
