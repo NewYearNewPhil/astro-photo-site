@@ -19,9 +19,9 @@ fs.readdir('./src/assets/images', (err, files) => {
 
         // Create the content for the markdown file
         const content = `---
-title: "${file}"
 src: "../../assets/images/${file}"
 date: 2022-01-01
+tags: []
 ---`;
 
         // Write the content to the markdown file

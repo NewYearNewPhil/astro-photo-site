@@ -8,7 +8,8 @@
     "build": "astro check && astro build",
     "preview": "astro preview",
     "yo": "astro build && astro preview --host",
-    "astro": "astro"
+    "astro": "astro",
+    "generate": "node generate_image_markdown.js"
   },
   "dependencies": {
     "@astrojs/check": "^0.7.0",

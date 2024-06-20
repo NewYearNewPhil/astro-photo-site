@@ -23,20 +23,21 @@ const { image, prevImage, nextImage } = Astro.props as any;
                         id="prevImage"
                         href={`../${prevImage.slug}/`}
                         data-astro-history="replace"
+                        class="join-item"
                     >
-                        <button class="join-item btn">«</button>
+                        <button class="btn">«</button>
                     </a>
                 )
             }
-            <button class="join-item btn">{image.data.title}</button>
             {
                 nextImage && (
                     <a
                         id="nextImage"
                         href={`../${nextImage.slug}/`}
                         data-astro-history="replace"
+                        class="join-item"
                     >
-                        <button class="join-item btn">»</button>
+                        <button class="btn">»</button>
                     </a>
                 )
             }
