@@ -6,7 +6,7 @@ const { image, prevImage, nextImage } = Astro.props as any;
 
 <div
     transition:animate="fade"
-    class="w-screen h-screen flex justify-center items-center"
+    class="w-screen h-[calc(100dvh)] flex justify-center items-center"
 >
     <Image
         class="max-w-screen max-h-screen w-auto h-auto absolute"
@@ -15,7 +15,7 @@ const { image, prevImage, nextImage } = Astro.props as any;
         src={image.data.src}
         alt=""
     />
-    <div class="fixed top-4 left-4 idle-hidden">
+    <div class="fixed top-4 left-4 shadow-lg idle-hidden">
         <a href="javascript:history.back()">
             <button class="btn">
                 <svg

@@ -5,7 +5,7 @@ export default function init() {
         function resetIdleTimer() {
             clearTimeout(idleTimeout);
             showIdleElements();
-            idleTimeout = setTimeout(hideIdleElements, 2500);
+            idleTimeout = setTimeout(hideIdleElements, 2000);
         }
 
         function hideIdleElements() {
