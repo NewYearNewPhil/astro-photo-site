@@ -26,9 +26,9 @@ let widths = responsiveImageSizes.getResponsiveSizes({
         loading="eager"
     />
 
-    <div class="fixed top-4 left-4 shadow-lg idle-hidden">
-        <a href="javascript:history.back()">
-            <button class="btn">
+    <div class="fixed top-4 left-4 idle-hidden">
+        <a href="javascript:history.back()" class="shadow-lg" aria-label="return to gallery">
+            <button class="btn" aria-label="return to gallery">
                 <svg
                     class="h-6 w-6 fill-current md:h-8 md:w-8"
                     xmlns="http://www.w3.org/2000/svg"
@@ -50,53 +50,52 @@ let widths = responsiveImageSizes.getResponsiveSizes({
         >
             {
                 prevImage && (
-                    <a
-                        id="prevImage"
-                        href={`../${prevImage.slug}/`}
-                        data-astro-history="replace"
-                        class="join-item"
+                    <button
+                        class="join-item btn"
+                        aria-label="<"
+                        role="link"
+                        data-href={`../${prevImage.slug}/`}
+                        data-prev-button
+                        data-replace
                     >
-                        <button class="btn" aria-label="<">
-                            <svg
-                                class="h-6 w-6 fill-current md:h-8 md:w-8"
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                            >
-                                <path d="M15.41,16.58L10.83,12L15.41,7.41L14,6L8,12L14,18L15.41,16.58Z" />
-                            </svg>
-                        </button>
-                    </a>
+                        <svg
+                            class="h-6 w-6 fill-current md:h-8 md:w-8"
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                        >
+                            <path d="M15.41,16.58L10.83,12L15.41,7.41L14,6L8,12L14,18L15.41,16.58Z" />
+                        </svg>
+                    </button>
                 )
             }
             {
                 nextImage && (
-                    <a
-                        id="nextImage"
-                        href={`../${nextImage.slug}/`}
-                        data-astro-history="replace"
-                        class="join-item"
+                    <button
+                        class="join-item btn"
+                        aria-label=">"
+                        role="link"
+                        data-href={`../${nextImage.slug}/`}
+                        data-next-button
+                        data-replace
                     >
-                        <button class="btn" aria-label=">">
-                            <svg
-                                class="h-6 w-6 fill-current md:h-8 md:w-8"
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                            >
-                                <path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z" />
-                            </svg>
-                        </button>
-                    </a>
+                        <svg
+                            class="h-6 w-6 fill-current md:h-8 md:w-8"
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                        >
+                            <path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z" />
+                        </svg>
+                    </button>
                 )
             }
         </div>
     </div>
 </div>
 <script>
-    import { navigate } from "astro:transitions/client";
     // changed from https://stackoverflow.com/a/23230280
 
     document.addEventListener("touchstart", handleTouchStart, false);
@@ -126,18 +125,24 @@ let widths = responsiveImageSizes.getResponsiveSizes({
             if (xDiff > 0) {
                 /* right swipe */
                 const nextImage = document.querySelector(
-                    "#nextImage",
-                ) as HTMLAnchorElement | null;
-                if (nextImage) {
-                    navigate(nextImage.href, { history: "replace" });
+                    "[data-next-button]",
+                ) as HTMLButtonElement | null;
+
+                const nextImageLink = nextImage?.getAttribute("data-href");
+
+                if (nextImageLink) {
+                    location.replace(nextImageLink);
                 }
             } else {
                 /* left swipe */
                 const prevImage = document.querySelector(
-                    "#prevImage",
-                ) as HTMLAnchorElement | null;
-                if (prevImage) {
-                    navigate(prevImage.href, { history: "replace" });
+                    "[data-prev-button]",
+                ) as HTMLButtonElement | null;
+
+                const prevImageLink = prevImage?.getAttribute("data-href");
+
+                if (prevImageLink) {
+                    location.replace(prevImageLink);
                 }
             }
         }
@@ -145,6 +150,15 @@ let widths = responsiveImageSizes.getResponsiveSizes({
         xDown = undefined;
         yDown = undefined;
     }
+</script>
+<script>
+    const buttons = document.querySelectorAll("[data-replace]");
+    buttons.forEach((button) => {
+        const href = button?.getAttribute("data-href");
+        if (href) {
+            button.addEventListener("click", () => location.replace(href));
+        }
+    });
 </script>
 <script>
     import init from "./IdleHidden";

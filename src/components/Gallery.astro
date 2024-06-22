@@ -105,7 +105,6 @@ for (const image of images) {
 </div>
 
 <script>
-	import { navigate } from "astro:transitions/client";
 	// changed from https://stackoverflow.com/a/23230280
 
 	document.addEventListener("touchstart", handleTouchStart, false);
@@ -137,9 +136,8 @@ for (const image of images) {
 				const nextPage = document.querySelector(
 					"#nextPage",
 				) as HTMLAnchorElement | null;
-				console.log(nextPage);
 				if (nextPage) {
-					navigate(nextPage.href, { history: "push" });
+					location.assign(nextPage.href);
 				}
 			} else {
 				/* left swipe */
@@ -147,7 +145,7 @@ for (const image of images) {
 					"#prevPage",
 				) as HTMLAnchorElement | null;
 				if (prevPage) {
-					navigate(prevPage.href, { history: "push" });
+					location.assign(prevPage.href);
 				}
 			}
 		}
