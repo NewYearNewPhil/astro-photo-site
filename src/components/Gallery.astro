@@ -1,5 +1,6 @@
 ---
 import { Image } from "astro:assets";
+import responsiveImageSizes from "./ResponsiveImageSizes.js";
 
 const { page } = Astro.props as any;
 const images = page.data;
@@ -7,6 +8,13 @@ const column1 = { images: [] as any[], height: 0 };
 const column2 = { images: [] as any[], height: 0 };
 
 for (const image of images) {
+	image.widths = responsiveImageSizes.getResponsiveSizes({
+		deviceType: "all",
+		sourceImageWidth: image.data.src.width,
+		widthOnPage: 50,
+		mode: "standard",
+		topSize: 2880,
+	});
 	const selectedColumn = column2.height >= column1.height ? column1 : column2;
 	selectedColumn.images.push(image);
 	selectedColumn.height += image.data.src.height;
@@ -15,13 +23,13 @@ for (const image of images) {
 
 <div class="w-full mb-4 px-4 md:px-0">
 	<div class="flex flex-row gap-4 md:gap-10">
-		<div class="flex flex-col gap-4 md:gap-10">
+		<div class="flex flex-col basis-0 grow gap-4 md:gap-10">
 			{
 				column1.images.map((image: any, index: number) => (
-					<a href={`../${image.slug}/`}>
+					<a href={`../${image.slug}/`} aria-label={image.slug}>
 						<Image
-							widths={[360, 720, 1024, 1920]}
-							sizes="(max-width: 360px) 360px, (max-width: 720px) 720px, (max-width: 1024px) 1024px, (max-width: 1920px) 1920px"
+							widths={image.widths}
+							sizes="(min-width: 1540px) 748px, (min-width: 1280px) 620px, (min-width: 1040px) 492px, (min-width: 820px) 364px, calc(47.6vw - 17px)"
 							src={image.data.src}
 							alt=""
 							loading={index >= 5 ? "lazy" : "eager"}
@@ -30,13 +38,13 @@ for (const image of images) {
 				))
 			}
 		</div>
-		<div class="flex flex-col gap-4 md:gap-10">
+		<div class="flex flex-col basis-0 grow gap-4 md:gap-10">
 			{
 				column2.images.map((image: any, index: number) => (
-					<a href={`../${image.slug}/`}>
+					<a href={`../${image.slug}/`} aria-label={image.slug}>
 						<Image
-							widths={[360, 720, 1024, 1920]}
-							sizes="(max-width: 360px) 360px, (max-width: 720px) 720px, (max-width: 1024px) 1024px, (max-width: 1920px) 1920px"
+							widths={image.widths}
+							sizes="(min-width: 1540px) 748px, (min-width: 1280px) 620px, (min-width: 1040px) 492px, (min-width: 820px) 364px, calc(47.6vw - 17px)"
 							src={image.data.src}
 							alt=""
 							loading={index >= 5 ? "lazy" : "eager"}
@@ -55,7 +63,7 @@ for (const image of images) {
 		{
 			page.currentPage > 1 && (
 				<a id="prevPage" href={page.url.prev}>
-					<button class="join-item btn">
+					<button class="join-item btn" aria-label="<">
 						<svg
 							class="h-6 w-6 fill-current md:h-8 md:w-8"
 							xmlns="http://www.w3.org/2000/svg"
@@ -79,8 +87,7 @@ for (const image of images) {
 		{
 			page.currentPage != page.lastPage && (
 				<a id="nextPage" href={page.url.next}>
-					{" "}
-					<button class="join-item btn">
+					<button class="join-item btn" aria-label=">">
 						<svg
 							class="h-6 w-6 fill-current md:h-8 md:w-8"
 							xmlns="http://www.w3.org/2000/svg"
