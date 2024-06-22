@@ -46,12 +46,12 @@ let widths = responsiveImageSizes.getResponsiveSizes({
     <div class="fixed bottom-4 flex justify-center w-full">
         <div
             transition:animate="none"
-            class="join bg-base-200 shadow-lg idle-hidden transition-opacity duration-200"
+            class={`${(prevImage && nextImage) ? 'join' : ''} rounded-lg bg-base-200 shadow-lg idle-hidden transition-opacity duration-200`}
         >
             {
                 prevImage && (
                     <button
-                        class="join-item btn"
+                        class={`${(prevImage && nextImage) ? 'join-item' : 'rounded-lg'} btn`}
                         aria-label="<"
                         role="link"
                         data-href={`../${prevImage.slug}/`}
@@ -73,8 +73,7 @@ let widths = responsiveImageSizes.getResponsiveSizes({
             {
                 nextImage && (
                     <button
-                        class="join-item btn"
-                        aria-label=">"
+                    class={`${(prevImage && nextImage) ? 'join-item' : 'rounded-lg'} btn`}                    aria-label=">"
                         role="link"
                         data-href={`../${nextImage.slug}/`}
                         data-next-button
