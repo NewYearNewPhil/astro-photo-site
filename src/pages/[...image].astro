@@ -14,7 +14,7 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 
 const images = await getCollection("images");
-const ownIndex = images.findIndex((i) => entry.slug === i.slug);
+const ownIndex = images.sort((i1, i2) => i2.data.date.getTime() - i1.data.date.getTime()).findIndex((i) => entry.slug === i.slug);
 
 let prevImage, nextImage;
 if (ownIndex > 0) {

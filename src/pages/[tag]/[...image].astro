@@ -14,9 +14,11 @@ export async function getStaticPaths() {
 		return acc;
 	}, []);
 	return tags.flatMap((tag: string) => {
-		const filteredImages = images.filter((image) =>
-			image.data.tags?.map(tag => tag.toLowerCase()).includes(tag),
-		);
+		const filteredImages = images
+			.sort((i1, i2) => i2.data.date.getTime() - i1.data.date.getTime())
+			.filter((image) =>
+				image.data.tags?.map((tag) => tag.toLowerCase()).includes(tag),
+			);
 
 		return filteredImages.map((entry) => ({
 			params: { image: entry.slug, tag: tag },
@@ -29,7 +31,11 @@ const { entry } = Astro.props;
 const { image, tag } = Astro.params;
 
 const images = await getCollection("images");
-const filteredImages = images.filter((image) => image.data.tags?.map(tag => tag.toLowerCase()).includes(tag));
+const filteredImages = images
+	.sort((i1, i2) => i2.data.date.getTime() - i1.data.date.getTime())
+	.filter((image) =>
+		image.data.tags?.map((tag) => tag.toLowerCase()).includes(tag),
+	);
 const ownIndex = filteredImages.findIndex((i) => image === i.slug);
 
 let prevImage, nextImage;

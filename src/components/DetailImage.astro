@@ -1,16 +1,12 @@
 ---
 import { Image } from "astro:assets";
-import responsiveImageSizes from "./ResponsiveImageSizes.js";
+import leftIcon from "../assets/caret-left.svg";
+import rightIcon from "../assets/caret-right.svg";
 
 const { image, prevImage, nextImage } = Astro.props as any;
 
-let widths = responsiveImageSizes.getResponsiveSizes({
-    deviceType: "all",
-    sourceImageWidth: image.data.src.width,
-    widthOnPage: 100,
-    mode: "standard",
-    topSize: 2880,
-});
+const breakpoints = [2880, 2560, 1920, 1600, 1440, 1024, 768, 640, 480, 240];
+let widths = breakpoints.filter((bp) => bp <= image.data.src.width);
 ---
 
 <div
@@ -27,67 +23,54 @@ let widths = responsiveImageSizes.getResponsiveSizes({
     />
 
     <div class="fixed top-4 left-4 idle-hidden">
-        <a href="javascript:history.back()" class="shadow-lg" aria-label="return to gallery">
+        <a
+            href="javascript:history.back()"
+            class="shadow-lg"
+            aria-label="return to gallery"
+        >
             <button class="btn" aria-label="return to gallery">
-                <svg
-                    class="h-6 w-6 fill-current md:h-8 md:w-8"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                >
-                    <path
-                        d="M15.41,16.58L10.83,12L15.41,7.41L14,6L8,12L14,18L15.41,16.58Z"
-                    ></path>
-                </svg>
+                <Image src={leftIcon} alt="<" class="h-6 w-6 md:h-8 md:w-8" />
             </button>
         </a>
     </div>
     <div class="fixed bottom-4 flex justify-center w-full">
         <div
             transition:animate="none"
-            class={`${(prevImage && nextImage) ? 'join' : ''} rounded-lg bg-base-200 shadow-lg idle-hidden transition-opacity duration-200`}
+            class={`${prevImage && nextImage ? "join" : ""} rounded-lg bg-base-200 shadow-lg idle-hidden transition-opacity duration-200`}
         >
             {
                 prevImage && (
                     <button
-                        class={`${(prevImage && nextImage) ? 'join-item' : 'rounded-lg'} btn`}
+                        class={`${prevImage && nextImage ? "join-item" : "rounded-lg"} btn`}
                         aria-label="<"
                         role="link"
                         data-href={`../${prevImage.slug}/`}
                         data-prev-button
                         data-replace
                     >
-                        <svg
-                            class="h-6 w-6 fill-current md:h-8 md:w-8"
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                        >
-                            <path d="M15.41,16.58L10.83,12L15.41,7.41L14,6L8,12L14,18L15.41,16.58Z" />
-                        </svg>
+                        <Image
+                            src={leftIcon}
+                            alt="<"
+                            class="h-6 w-6 md:h-8 md:w-8"
+                        />
                     </button>
                 )
             }
             {
                 nextImage && (
                     <button
-                    class={`${(prevImage && nextImage) ? 'join-item' : 'rounded-lg'} btn`}                    aria-label=">"
+                        class={`${prevImage && nextImage ? "join-item" : "rounded-lg"} btn`}
+                        aria-label=">"
                         role="link"
                         data-href={`../${nextImage.slug}/`}
                         data-next-button
                         data-replace
                     >
-                        <svg
-                            class="h-6 w-6 fill-current md:h-8 md:w-8"
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                        >
-                            <path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z" />
-                        </svg>
+                        <Image
+                            src={rightIcon}
+                            alt=">"
+                            class="h-6 w-6 md:h-8 md:w-8"
+                        />
                     </button>
                 )
             }

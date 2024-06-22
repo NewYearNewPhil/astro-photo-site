@@ -1,23 +1,24 @@
 ---
 import { Image } from "astro:assets";
-import responsiveImageSizes from "./ResponsiveImageSizes.js";
+import leftIcon from "../assets/caret-left.svg";
+import rightIcon from "../assets/caret-right.svg";
 
 const { page } = Astro.props as any;
 const images = page.data;
 const column1 = { images: [] as any[], height: 0 };
 const column2 = { images: [] as any[], height: 0 };
 
+const breakpoints = [1440, 1024, 768, 640, 480, 320, 240, 120];
+
 for (const image of images) {
-	image.widths = responsiveImageSizes.getResponsiveSizes({
-		deviceType: "all",
-		sourceImageWidth: image.data.src.width,
-		widthOnPage: 50,
-		mode: "standard",
-		topSize: 2880,
-	});
+	// multiplying breakpoint * 2 because of 2 columns
+	image.widths = breakpoints.filter(
+		(breakpoint) => image.data.src.width >= breakpoint * 2,
+	);
+
 	const selectedColumn = column2.height >= column1.height ? column1 : column2;
 	selectedColumn.images.push(image);
-	selectedColumn.height += image.data.src.height;
+	selectedColumn.height += image.data.src.height / image.data.src.width;
 }
 ---
 
@@ -64,15 +65,11 @@ for (const image of images) {
 			page.currentPage > 1 && (
 				<a id="prevPage" href={page.url.prev}>
 					<button class="join-item btn" aria-label="<">
-						<svg
-							class="h-6 w-6 fill-current md:h-8 md:w-8"
-							xmlns="http://www.w3.org/2000/svg"
-							width="24"
-							height="24"
-							viewBox="0 0 24 24"
-						>
-							<path d="M15.41,16.58L10.83,12L15.41,7.41L14,6L8,12L14,18L15.41,16.58Z" />
-						</svg>
+						<Image
+							src={leftIcon}
+							alt="<"
+							class="h-6 w-6 md:h-8 md:w-8"
+						/>
 					</button>
 				</a>
 			)
@@ -88,15 +85,11 @@ for (const image of images) {
 			page.currentPage != page.lastPage && (
 				<a id="nextPage" href={page.url.next}>
 					<button class="join-item btn" aria-label=">">
-						<svg
-							class="h-6 w-6 fill-current md:h-8 md:w-8"
-							xmlns="http://www.w3.org/2000/svg"
-							width="24"
-							height="24"
-							viewBox="0 0 24 24"
-						>
-							<path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z" />
-						</svg>
+						<Image
+							src={rightIcon}
+							alt=">"
+							class="h-6 w-6 md:h-8 md:w-8"
+						/>
 					</button>
 				</a>
 			)
