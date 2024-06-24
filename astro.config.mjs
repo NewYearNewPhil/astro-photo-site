@@ -7,6 +7,7 @@ export default defineConfig({
   experimental: {
     contentCollectionCache: true
   },
+  prefetch: true,
   trailingSlash: 'always',
   redirects: {
     "/": "/1/"

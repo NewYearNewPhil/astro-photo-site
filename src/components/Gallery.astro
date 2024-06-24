@@ -27,7 +27,7 @@ for (const image of images) {
 		<div class="flex flex-col basis-0 grow gap-4 md:gap-10">
 			{
 				column1.images.map((image: any, index: number) => (
-					<a href={`../${image.slug}/`} aria-label={image.slug}>
+					<a href={`../${image.slug}/`} aria-label={image.slug} data-astro-prefetch>
 						<Image
 							widths={image.widths}
 							sizes="(min-width: 1540px) 748px, (min-width: 1280px) 620px, (min-width: 1040px) 492px, (min-width: 820px) 364px, calc(47.6vw - 17px)"
@@ -63,7 +63,7 @@ for (const image of images) {
 	>
 		{
 			page.currentPage > 1 && (
-				<a id="prevPage" href={page.url.prev}>
+				<a id="prevPage" href={page.url.prev} data-astro-prefetch>
 					<button class="join-item btn" aria-label="<">
 						<Image
 							src={leftIcon}
@@ -83,7 +83,7 @@ for (const image of images) {
 		}
 		{
 			page.currentPage != page.lastPage && (
-				<a id="nextPage" href={page.url.next}>
+				<a id="nextPage" href={page.url.next} data-astro-prefetch>
 					<button class="join-item btn" aria-label=">">
 						<Image
 							src={rightIcon}
