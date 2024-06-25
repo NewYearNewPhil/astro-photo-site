@@ -10,7 +10,7 @@
     "postCreateCommand": "npm install",
     // Sets up .lfsconfig and marks it for local-only changes
     "postStartCommand": [
-        "bash", "-c", "echo {$LFSCONFIG} > .lfsconfig; git update-index --skip-worktree .lfsconfig;"
+        "bash", "-c", "echo $LFSCONFIG > .lfsconfig; git lfs install; git lfs pull; git update-index --skip-worktree .lfsconfig;"
     ],
     "customizations": {
         "vscode": {
