@@ -20,3 +20,5 @@ pnpm-debug.log*
 
 .src/assets/images/*
 .src/content/image/*
+
+.lfsconfig
