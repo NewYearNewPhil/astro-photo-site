@@ -86,6 +86,14 @@ let widths = breakpoints.filter((bp) => bp <= image.data.src.width);
     let xDown: number | undefined = undefined;
     let yDown: number | undefined = undefined;
 
+    document.addEventListener("keydown", (evt) => {
+        if (evt.key === "ArrowLeft") {
+            navigatePrev();
+        } else if (evt.key === "ArrowRight") {
+            navigateNext();
+        }
+    });
+
     function handleTouchStart(evt: TouchEvent) {
         const firstTouch = evt.touches[0];
         xDown = firstTouch.clientX;
@@ -106,31 +114,39 @@ let widths = breakpoints.filter((bp) => bp <= image.data.src.width);
         if (Math.abs(xDiff) > Math.abs(yDiff)) {
             if (xDiff > 0) {
                 /* right swipe */
-                const nextImage = document.querySelector(
-                    "[data-next-button]",
-                ) as HTMLButtonElement | null;
-
-                const nextImageLink = nextImage?.getAttribute("data-href");
-
-                if (nextImageLink) {
-                    location.replace(nextImageLink);
-                }
+                navigateNext();
             } else {
                 /* left swipe */
-                const prevImage = document.querySelector(
-                    "[data-prev-button]",
-                ) as HTMLButtonElement | null;
-
-                const prevImageLink = prevImage?.getAttribute("data-href");
-
-                if (prevImageLink) {
-                    location.replace(prevImageLink);
-                }
+                navigatePrev();
             }
         }
 
         xDown = undefined;
         yDown = undefined;
+    }
+
+    function navigatePrev() {
+        const prevImage = document.querySelector(
+            "[data-prev-button]",
+        ) as HTMLButtonElement | null;
+
+        const prevImageLink = prevImage?.getAttribute("data-href");
+
+        if (prevImageLink) {
+            location.replace(prevImageLink);
+        }
+    }
+
+    function navigateNext() {
+        const nextImage = document.querySelector(
+            "[data-next-button]",
+        ) as HTMLButtonElement | null;
+
+        const nextImageLink = nextImage?.getAttribute("data-href");
+
+        if (nextImageLink) {
+            location.replace(nextImageLink);
+        }
     }
 </script>
 <script>

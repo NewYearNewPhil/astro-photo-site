@@ -27,7 +27,11 @@ for (const image of images) {
 		<div class="flex flex-col basis-0 grow gap-4 md:gap-10">
 			{
 				column1.images.map((image: any, index: number) => (
-					<a href={`../${image.slug}/`} aria-label={image.slug} data-astro-prefetch>
+					<a
+						href={`../${image.slug}/`}
+						aria-label={image.slug}
+						data-astro-prefetch
+					>
 						<Image
 							widths={image.widths}
 							sizes="(min-width: 1540px) 748px, (min-width: 1280px) 620px, (min-width: 1040px) 492px, (min-width: 820px) 364px, calc(47.6vw - 17px)"
@@ -106,6 +110,14 @@ for (const image of images) {
 	let xDown: number | undefined = undefined;
 	let yDown: number | undefined = undefined;
 
+	document.addEventListener("keydown", (evt) => {
+		if (evt.key === "ArrowLeft") {
+			navigatePrev();
+		} else if (evt.key === "ArrowRight") {
+			navigateNext();
+		}
+	});
+
 	function handleTouchStart(evt: TouchEvent) {
 		const firstTouch = evt.touches[0];
 		xDown = firstTouch.clientX;
@@ -126,25 +138,33 @@ for (const image of images) {
 		if (Math.abs(xDiff) > Math.abs(yDiff)) {
 			if (xDiff > 0) {
 				/* right swipe */
-				const nextPage = document.querySelector(
-					"#nextPage",
-				) as HTMLAnchorElement | null;
-				if (nextPage) {
-					location.assign(nextPage.href);
-				}
+				navigateNext();
 			} else {
 				/* left swipe */
-				const prevPage = document.querySelector(
-					"#prevPage",
-				) as HTMLAnchorElement | null;
-				if (prevPage) {
-					location.assign(prevPage.href);
-				}
+				navigatePrev();
 			}
 		}
 
 		xDown = undefined;
 		yDown = undefined;
+	}
+
+	function navigatePrev() {
+		const prevPage = document.querySelector(
+			"#prevPage",
+		) as HTMLAnchorElement | null;
+		if (prevPage) {
+			location.assign(prevPage.href);
+		}
+	}
+
+	function navigateNext() {
+		const nextPage = document.querySelector(
+			"#nextPage",
+		) as HTMLAnchorElement | null;
+		if (nextPage) {
+			location.assign(nextPage.href);
+		}
 	}
 </script>
 <script>
