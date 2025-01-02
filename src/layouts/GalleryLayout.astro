@@ -2,10 +2,13 @@
 import Footer from "../components/Footer.astro";
 import Navbar from "../components/Navbar.astro";
 import MainLayout from "./MainLayout.astro";
+
+const { currentTag } = Astro.props as any;
+
 ---
 <MainLayout>
 	<div class="md:container mx-auto">
-		<Navbar />
+		<Navbar currentTag={currentTag} />
 		<aside>
 			<slot />
 		</aside>

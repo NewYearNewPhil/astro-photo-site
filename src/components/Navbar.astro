@@ -1,6 +1,9 @@
 ---
 import { getCollection } from "astro:content";
 
+const { currentTag } = Astro.props as any;
+
+console.log(currentTag);
 const images = await getCollection("images");
 const tags = images.reduce((acc: any, image) => {
     image.data.tags?.forEach((tag) => {
@@ -14,7 +17,11 @@ const tags = images.reduce((acc: any, image) => {
 <div class="h-72 -mb-56">
     <div class="navbar sticky px-0 top-0 h-16 bg-base-100/50 z-50">
         <div class="flex-1">
-            <a href="/" class="btn btn-ghost text-xl">Astro Photo Site</a>
+            <a href="/" class="btn btn-ghost text-xl">Astro Photo Site
+            {currentTag && 
+                <span class="text-gray-500">#{currentTag}</span>
+            }
+            </a>
         </div>
         <div class="flex-none">
             <ul class="menu menu-horizontal px-0">
@@ -25,7 +32,7 @@ const tags = images.reduce((acc: any, image) => {
                             {
                                 tags.map((tag: string) => (
                                     <li>
-                                        <a href={`/${tag.toLowerCase()}/1/`}>{tag}</a>
+                                        <a href={`/${tag.toLowerCase()}/1/`} class="whitespace-nowrap">{tag}</a>
                                     </li>
                                 ))
                             }
