@@ -3,10 +3,10 @@ import Footer from "../components/Footer.astro";
 import Navbar from "../components/Navbar.astro";
 import MainLayout from "./MainLayout.astro";
 ---
-<MainLayout transition:animate="none">
+<MainLayout>
 	<div class="md:container mx-auto">
 		<Navbar />
-		<aside transition:animate="fade">
+		<aside>
 			<slot />
 		</aside>
 		<Footer />

@@ -13,8 +13,8 @@
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
-    "@astrojs/tailwind": "^5.1.2",
-    "astro": "^4.16.15",
+    "@astrojs/tailwind": "^5.1.4",
+    "astro": "^5.1.1",
     "tailwindcss": "^3.4.3",
     "typescript": "^5.4.5"
   },

@@ -2,6 +2,7 @@
 import { Image } from "astro:assets";
 import leftIcon from "../assets/caret-left.svg";
 import rightIcon from "../assets/caret-right.svg";
+import { slide } from "astro:transitions";
 
 const { page } = Astro.props as any;
 const images = page.data;
@@ -22,7 +23,7 @@ for (const image of images) {
 }
 ---
 
-<div class="w-full mb-4 px-4 md:px-0">
+<div class="w-full mb-4 px-4 md:px-0" transition:animate="fade">
 	<div class="flex flex-row gap-4 md:gap-10">
 		<div class="flex flex-col basis-0 grow gap-4 md:gap-10">
 			{
@@ -60,9 +61,8 @@ for (const image of images) {
 		</div>
 	</div>
 </div>
-<div class="fixed bottom-4 left-0 right-0 flex justify-center w-full">
+<div class="fixed bottom-4 left-0 right-0 flex justify-center w-full" transition:animate="none">
 	<div
-		transition:animate="none"
 		class="join bg-base-200 shadow-lg idle-hidden transition-opacity duration-200"
 	>
 		{

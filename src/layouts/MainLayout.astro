@@ -1,5 +1,6 @@
 ---
 import "../base.css";
+import { ClientRouter } from 'astro:transitions';
 ---
 
 <html lang="en">
@@ -11,13 +12,10 @@ import "../base.css";
 		<meta name="robots" content="noindex" />
 		<title>Astro Photo Site</title>
 		<meta name="description" content="Photo Gallery built with Astro" />
+
+		<ClientRouter />
 	</head>
 	<body>
 		<slot />
-		<style>
-			@view-transition {
-				navigation: auto; /* enabled! */
-			}
-		</style>
 	</body>
 </html>

@@ -4,9 +4,6 @@ import tailwind from "@astrojs/tailwind";
 // https://astro.build/config
 export default defineConfig({
   //https://github.com/withastro/roadmap/pull/901
-  experimental: {
-    contentCollectionCache: true
-  },
   prefetch: true,
   trailingSlash: 'always',
   redirects: {

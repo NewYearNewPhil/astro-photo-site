@@ -10,7 +10,6 @@ let widths = breakpoints.filter((bp) => bp <= image.data.src.width);
 ---
 
 <div
-    transition:animate="fade"
     class="w-screen h-[calc(100dvh)] flex justify-center items-center"
 >
     <Image
@@ -33,9 +32,8 @@ let widths = breakpoints.filter((bp) => bp <= image.data.src.width);
             </button>
         </a>
     </div>
-    <div class="fixed bottom-4 flex justify-center w-full">
+    <div class="fixed bottom-4 flex justify-center w-full" transition:animate="none">
         <div
-            transition:animate="none"
             class={`${prevImage && nextImage ? "join" : ""} rounded-lg bg-base-200 shadow-lg idle-hidden transition-opacity duration-200`}
         >
             {
