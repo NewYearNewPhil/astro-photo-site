@@ -1,18 +1,12 @@
 ---
-import { getCollection } from "astro:content";
+import { extractTags } from "../utils/imageLoader.ts";
 
 const { currentTag } = Astro.props as any;
 
 console.log(currentTag);
-const images = await getCollection("images");
-const tags = images.reduce((acc: any, image) => {
-    image.data.tags?.forEach((tag) => {
-        if (!acc.includes(tag)) {
-            acc.push(tag);
-        }
-    });
-    return acc;
-}, []);
+// Get all available tags from directories
+const allImageModules = import.meta.glob("../assets/images/**/*.{jpeg,jpg,png,webp}", { eager: true });
+const tags = extractTags(allImageModules);
 ---
 <div class="h-72 -mb-56">
     <div class="navbar sticky px-0 top-0 h-16 bg-base-100/50 z-50">

@@ -1,47 +1,27 @@
 ---
-import { getCollection } from "astro:content";
 import Gallery from "../../components/Gallery.astro";
 import GalleryLayout from "../../layouts/GalleryLayout.astro";
+import { groupImagesByTag, extractTags } from "../../utils/imageLoader.ts";
 
 export async function getStaticPaths({ paginate }: { paginate: any }) {
-	const images = await getCollection("images");
-	const tags = images.reduce((acc: any, image) => {
-		image.data.tags?.forEach((tag) => {
-			if (!acc.includes(tag.toLowerCase())) {
-				acc.push(tag.toLowerCase());
-			}
+	const allImageModules = import.meta.glob("../../assets/images/**/*.{jpeg,jpg,png,webp}", { eager: true });
+	const imagesByTag = await groupImagesByTag(allImageModules);
+	
+	// Create paginated routes for each tag
+	return Object.entries(imagesByTag).flatMap(([tag, images]) => {
+		return paginate(images, {
+			params: { tag },
+			pageSize: import.meta.env.PUBLIC_IMAGES_PER_PAGE,
 		});
-		return acc;
-	}, []);
-	return tags.flatMap((tag: string) => {
-		const filteredImages = images
-			.filter((image) =>
-				image.data.tags?.map((tag) => tag.toLowerCase()).includes(tag),
-			);
-		return paginate(
-			filteredImages.sort(
-				(i1, i2) => i2.data.date.getTime() - i1.data.date.getTime(),
-			),
-			{
-				params: { tag },
-				pageSize: import.meta.env.PUBLIC_IMAGES_PER_PAGE,
-			},
-		);
 	});
 }
 
 const { page } = Astro.props as any;
-
 const { tag } = Astro.params;
-const images = await getCollection("images");
-const tags = images.reduce((acc: any, image) => {
-	image.data.tags?.forEach((tag) => {
-		if (!acc.includes(tag)) {
-			acc.push(tag);
-		}
-	});
-	return acc;
-}, []);
+
+// Get all available tags from directories
+const allImageModules = import.meta.glob("../../assets/images/**/*.{jpeg,jpg,png,webp}", { eager: true });
+const tags = extractTags(allImageModules);
 const currentTag = tags.find((t: string) => t.toLowerCase() === tag);
 ---
 

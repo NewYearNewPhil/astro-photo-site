@@ -1,10 +1,11 @@
 ---
-import { getCollection } from "astro:content";
 import MainLayout from "../layouts/MainLayout.astro";
 import DetailImage from "../components/DetailImage.astro";
+import { processImages } from "../utils/imageLoader.ts";
 
 export async function getStaticPaths() {
-	const images = await getCollection("images");
+	const allImageModules = import.meta.glob("../assets/images/**/*.{jpeg,jpg,png,webp}", { eager: true });
+	const images = await processImages(allImageModules);
 	return images.map((entry) => ({
 		params: { image: entry.slug },
 		props: { entry },
@@ -13,14 +14,15 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props;
 
-const images = await getCollection("images");
-const ownIndex = images.sort((i1, i2) => i2.data.date.getTime() - i1.data.date.getTime()).findIndex((i) => entry.slug === i.slug);
+const allImageModules = import.meta.glob("../assets/images/**/*.{jpeg,jpg,png,webp}", { eager: true });
+const images = await processImages(allImageModules);
+const ownIndex = images.findIndex((i) => entry.slug === i.slug);
 
 let prevImage, nextImage;
 if (ownIndex > 0) {
 	prevImage = images[ownIndex - 1];
 }
-if (ownIndex < images.length) {
+if (ownIndex < images.length - 1) {
 	nextImage = images[ownIndex + 1];
 }
 ---

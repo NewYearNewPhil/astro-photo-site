@@ -1,26 +1,14 @@
 ---
-import { getCollection } from "astro:content";
 import MainLayout from "../../layouts/MainLayout.astro";
 import DetailImage from "../../components/DetailImage.astro";
+import { groupImagesByTag } from "../../utils/imageLoader.ts";
 
 export async function getStaticPaths() {
-	const images = await getCollection("images");
-	const tags = images.reduce((acc: any, image) => {
-		image.data.tags?.forEach((tag) => {
-			if (!acc.includes(tag.toLowerCase())) {
-				acc.push(tag.toLowerCase());
-			}
-		});
-		return acc;
-	}, []);
-	return tags.flatMap((tag: string) => {
-		const filteredImages = images
-			.sort((i1, i2) => i2.data.date.getTime() - i1.data.date.getTime())
-			.filter((image) =>
-				image.data.tags?.map((tag) => tag.toLowerCase()).includes(tag),
-			);
+	const allImageModules = import.meta.glob("../../assets/images/**/*.{jpeg,jpg,png,webp}", { eager: true });
+	const imagesByTag = await groupImagesByTag(allImageModules);
 
-		return filteredImages.map((entry) => ({
+	return Object.entries(imagesByTag).flatMap(([tag, images]) => {
+		return images.map((entry) => ({
 			params: { image: entry.slug, tag: tag },
 			props: { entry },
 		}));
@@ -30,19 +18,16 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 const { image, tag } = Astro.params;
 
-const images = await getCollection("images");
-const filteredImages = images
-	.sort((i1, i2) => i2.data.date.getTime() - i1.data.date.getTime())
-	.filter((image) =>
-		image.data.tags?.map((tag) => tag.toLowerCase()).includes(tag),
-	);
+const allImageModules = import.meta.glob("../../assets/images/**/*.{jpeg,jpg,png,webp}", { eager: true });
+const imagesByTag = await groupImagesByTag(allImageModules);
+const filteredImages = imagesByTag[tag] || [];
 const ownIndex = filteredImages.findIndex((i) => image === i.slug);
 
 let prevImage, nextImage;
 if (ownIndex > 0) {
 	prevImage = filteredImages[ownIndex - 1];
 }
-if (ownIndex < images.length) {
+if (ownIndex < filteredImages.length - 1) {
 	nextImage = filteredImages[ownIndex + 1];
 }
 ---
