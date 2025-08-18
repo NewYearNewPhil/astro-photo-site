@@ -10,7 +10,7 @@ export async function getStaticPaths({ paginate }: { paginate: any }) {
 	// Create paginated routes for each tag
 	return Object.entries(imagesByTag).flatMap(([tag, images]) => {
 		return paginate(images, {
-			params: { tag },
+			params: { tag: tag.toLowerCase() },
 			pageSize: import.meta.env.PUBLIC_IMAGES_PER_PAGE,
 		});
 	});
@@ -22,7 +22,7 @@ const { tag } = Astro.params;
 // Get all available tags from directories
 const allImageModules = import.meta.glob("../../assets/images/**/*.{jpeg,jpg,png,webp}", { eager: true });
 const tags = extractTags(allImageModules);
-const currentTag = tags.find((t: string) => t.toLowerCase() === tag);
+const currentTag = tags.find((t: string) => t.toLowerCase() === tag.toLowerCase());
 ---
 
 <GalleryLayout currentTag={currentTag}>

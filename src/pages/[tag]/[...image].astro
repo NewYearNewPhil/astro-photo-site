@@ -9,7 +9,7 @@ export async function getStaticPaths() {
 
 	return Object.entries(imagesByTag).flatMap(([tag, images]) => {
 		return images.map((entry) => ({
-			params: { image: entry.slug, tag: tag },
+			params: { image: entry.slug, tag: tag.toLowerCase() },
 			props: { entry },
 		}));
 	});
@@ -20,7 +20,8 @@ const { image, tag } = Astro.params;
 
 const allImageModules = import.meta.glob("../../assets/images/**/*.{jpeg,jpg,png,webp}", { eager: true });
 const imagesByTag = await groupImagesByTag(allImageModules);
-const filteredImages = imagesByTag[tag] || [];
+const actualTag = Object.keys(imagesByTag).find(t => t.toLowerCase() === tag.toLowerCase());
+const filteredImages = imagesByTag[actualTag] || [];
 const ownIndex = filteredImages.findIndex((i) => image === i.slug);
 
 let prevImage, nextImage;

@@ -12,6 +12,9 @@ export default defineConfig({
   devToolbar: {
     enabled: false
   },
+  image: {
+    responsiveStyles: false
+  },
   integrations: [tailwind({
     applyBaseStyles: false
   })]
