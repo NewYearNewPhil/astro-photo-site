@@ -1,11 +1,12 @@
 ---
 import Gallery from "../../components/Gallery.astro";
 import GalleryLayout from "../../layouts/GalleryLayout.astro";
-import { groupImagesByTag, extractTags } from "../../utils/imageLoader.ts";
+import { getCollection } from "astro:content";
+import { groupImagesByTagFromCollection, extractTagsFromCollection } from "../../utils/imageLoader.ts";
 
 export async function getStaticPaths({ paginate }: { paginate: any }) {
-	const allImageModules = import.meta.glob("../../assets/images/**/*.{jpeg,jpg,png,webp}", { eager: true });
-	const imagesByTag = await groupImagesByTag(allImageModules);
+	const entries = await getCollection("images");
+	const imagesByTag = await groupImagesByTagFromCollection(entries);
 	
 	// Create paginated routes for each tag
 	return Object.entries(imagesByTag).flatMap(([tag, images]) => {
@@ -20,9 +21,10 @@ const { page } = Astro.props as any;
 const { tag } = Astro.params;
 
 // Get all available tags from directories
-const allImageModules = import.meta.glob("../../assets/images/**/*.{jpeg,jpg,png,webp}", { eager: true });
-const tags = extractTags(allImageModules);
+const entries = await getCollection("images");
+const tags = extractTagsFromCollection(entries);
 const currentTag = tags.find((t: string) => t.toLowerCase() === tag.toLowerCase());
+
 ---
 
 <GalleryLayout currentTag={currentTag}>

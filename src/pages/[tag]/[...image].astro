@@ -1,11 +1,12 @@
 ---
 import MainLayout from "../../layouts/MainLayout.astro";
 import DetailImage from "../../components/DetailImage.astro";
-import { groupImagesByTag } from "../../utils/imageLoader.ts";
+import { getCollection } from "astro:content";
+import { groupImagesByTagFromCollection } from "../../utils/imageLoader.ts";
 
 export async function getStaticPaths() {
-	const allImageModules = import.meta.glob("../../assets/images/**/*.{jpeg,jpg,png,webp}", { eager: true });
-	const imagesByTag = await groupImagesByTag(allImageModules);
+	const entries = await getCollection("images");
+	const imagesByTag = await groupImagesByTagFromCollection(entries);
 
 	return Object.entries(imagesByTag).flatMap(([tag, images]) => {
 		return images.map((entry) => ({
@@ -18,10 +19,10 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 const { image, tag } = Astro.params;
 
-const allImageModules = import.meta.glob("../../assets/images/**/*.{jpeg,jpg,png,webp}", { eager: true });
-const imagesByTag = await groupImagesByTag(allImageModules);
-const actualTag = Object.keys(imagesByTag).find(t => t.toLowerCase() === tag.toLowerCase());
-const filteredImages = imagesByTag[actualTag] || [];
+const entries = await getCollection("images");
+const imagesByTag = await groupImagesByTagFromCollection(entries);
+const actualTag = Object.keys(imagesByTag).find((t) => t.toLowerCase() === tag.toLowerCase());
+const filteredImages = imagesByTag[actualTag ?? ""] || [];
 const ownIndex = filteredImages.findIndex((i) => image === i.slug);
 
 let prevImage, nextImage;

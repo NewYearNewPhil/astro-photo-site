@@ -2,7 +2,7 @@
 import { Image } from "astro:assets";
 import leftIcon from "../assets/caret-left.svg";
 import rightIcon from "../assets/caret-right.svg";
-import { slide } from "astro:transitions";
+import EditModeOnly from "./EditModeOnly.astro";
 
 const { page } = Astro.props as any;
 const images = page.data;
@@ -32,6 +32,7 @@ for (const image of images) {
 						href={`../${image.slug}/`}
 						aria-label={image.slug}
 						data-astro-prefetch
+						class="relative block"
 					>
 						<Image
 							widths={image.widths}
@@ -40,6 +41,9 @@ for (const image of images) {
 							alt=""
 							loading={index >= 5 ? "lazy" : "eager"}
 						/>
+						<EditModeOnly class="absolute top-2 right-2">
+							<!-- this needs to have the following actions: delete, change position (up/down), edit metadata -->
+						</EditModeOnly>
 					</a>
 				))
 			}
@@ -47,7 +51,7 @@ for (const image of images) {
 		<div class="flex flex-col basis-0 grow gap-4 md:gap-10">
 			{
 				column2.images.map((image: any, index: number) => (
-					<a href={`../${image.slug}/`} aria-label={image.slug}>
+					<a href={`../${image.slug}/`} aria-label={image.slug} class="relative block">
 						<Image
 							widths={image.widths}
 							sizes="(min-width: 1540px) 748px, (min-width: 1280px) 620px, (min-width: 1040px) 492px, (min-width: 820px) 364px, calc(47.6vw - 17px)"
@@ -55,6 +59,11 @@ for (const image of images) {
 							alt=""
 							loading={index >= 5 ? "lazy" : "eager"}
 						/>
+						<EditModeOnly class="absolute top-2 right-2">
+							<button type="button" class="btn btn-xs">
+								Manage
+							</button>
+						</EditModeOnly>
 					</a>
 				))
 			}

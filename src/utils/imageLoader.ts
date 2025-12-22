@@ -1,3 +1,5 @@
+import type { CollectionEntry } from "astro:content";
+
 export interface ExifData {
   camera?: string;
   lens?: string;
@@ -11,7 +13,7 @@ export interface ImageData {
   slug: string;
   data: {
     src: any;
-    tag: string;
+    tags: string[];
     exif?: ExifData;
   };
 }
@@ -55,74 +57,65 @@ function formatShutterSpeed(exposureTime: number): string {
   }
 }
 
-export async function processImages(imageModules: Record<string, any>): Promise<ImageData[]> {
-  const imageList: { filename: string; path: string; module: any }[] = [];
-  
-  for (const [path, module] of Object.entries(imageModules)) {
-    const filename = path.split('/').pop()?.replace(/\.[^/.]+$/, '') || '';
-    imageList.push({ filename, path, module });
-  }
-  
-  // support numeric prefix for sorting
-  imageList.sort((a, b) => {
-    const aMatch = a.filename.match(/^(\d+)_/);
-    const bMatch = b.filename.match(/^(\d+)_/);
-    
-    if (aMatch && bMatch) {
-      const aNum = parseInt(aMatch[1], 10);
-      const bNum = parseInt(bMatch[1], 10);
-      return aNum - bNum;
-    }
-    
-    if (aMatch && !bMatch) return -1;
-    if (!aMatch && bMatch) return 1;
-    
-    return a.filename.localeCompare(b.filename);
-  });
-  
-  const allImages: ImageData[] = [];
-  for (const { filename, path, module } of imageList) {
-    const pathParts = path.split('/');
-    const folder = pathParts[pathParts.length - 2];
-    
-    const slug = filename.replace(/^\d+_/, '');
-    
-    // Convert glob path to actual file system path for EXIF extraction
-    // Remove all ../ segments and prepend src/
-    const filePath = path.replace(/\.\.\//g, '').replace('assets/', 'src/assets/');
-    const exifData = await extractExifData(filePath);
-    
-    allImages.push({
-      slug: slug,
+export async function processImagesFromCollection(
+  entries: CollectionEntry<"images">[],
+  assetModules?: Record<string, any>,
+): Promise<ImageData[]> {
+  const sorted = sortEntries(entries);
+  const assets =
+    assetModules ?? import.meta.glob("../assets/images/**/*.{jpeg,jpg,png,webp}", { eager: true });
+
+  const results: ImageData[] = [];
+  for (const entry of sorted) {
+    const src = resolveAsset(entry.data.image, assets);
+    results.push({
+      slug: entry.data.slug ?? entry.id,
       data: {
-        src: module.default,
-        tag: folder,
-        exif: exifData
-      }
+        src,
+        tags: entry.data.tags ?? [],
+        exif: entry.data.exif,
+      },
     });
   }
-
-  return allImages;
+  return results;
 }
 
-export function extractTags(imageModules: Record<string, any>): string[] {
-  const tags = [...new Set(Object.keys(imageModules).map(path => {
-    const pathParts = path.split('/');
-    return pathParts[pathParts.length - 2];
-  }))];
-  
+function resolveAsset(imagePath: string, assets: Record<string, any>) {
+  const filename = imagePath.split("/").pop();
+  if (!filename) return undefined;
+  const matchKey = Object.keys(assets).find((key) => key.endsWith(`/${filename}`));
+  const mod = matchKey ? assets[matchKey] : undefined;
+  return mod ? mod.default ?? mod : undefined;
+}
+
+function sortEntries(entries: CollectionEntry<"images">[]) {
+  return [...entries].sort((a, b) => {
+    const aOrder = a.data.order ?? Number.POSITIVE_INFINITY;
+    const bOrder = b.data.order ?? Number.POSITIVE_INFINITY;
+    if (aOrder !== bOrder) return aOrder - bOrder;
+    return a.id.localeCompare(b.id);
+  });
+}
+
+export function extractTagsFromCollection(entries: CollectionEntry<"images">[]): string[] {
+  const tags = [...new Set(entries.flatMap((e) => e.data.tags ?? []))];
   return tags.sort();
 }
 
-export async function groupImagesByTag(imageModules: Record<string, any>): Promise<Record<string, ImageData[]>> {
-  const allImages = await processImages(imageModules);
+export async function groupImagesByTagFromCollection(
+  entries: CollectionEntry<"images">[],
+): Promise<Record<string, ImageData[]>> {
+  const allImages = await processImagesFromCollection(entries);
   const imagesByTag: Record<string, ImageData[]> = {};
 
   for (const image of allImages) {
-    if (!imagesByTag[image.data.tag]) {
-      imagesByTag[image.data.tag] = [];
+    const tags = image.data.tags?.length ? image.data.tags : ["untagged"];
+    for (const tag of tags) {
+      if (!imagesByTag[tag]) {
+        imagesByTag[tag] = [];
+      }
+      imagesByTag[tag].push(image);
     }
-    imagesByTag[image.data.tag].push(image);
   }
 
   return imagesByTag;

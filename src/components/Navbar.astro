@@ -1,12 +1,13 @@
 ---
-import { extractTags } from "../utils/imageLoader.ts";
+import { getCollection } from "astro:content";
+import { extractTagsFromCollection } from "../utils/imageLoader.ts";
+import EditModeToggle from "./EditModeToggle.astro";
+import EditModeOnly from "./EditModeOnly.astro";
 
 const { currentTag } = Astro.props as any;
 
-console.log(currentTag);
-// Get all available tags from directories
-const allImageModules = import.meta.glob("../assets/images/**/*.{jpeg,jpg,png,webp}", { eager: true });
-const tags = extractTags(allImageModules);
+const entries = await getCollection("images");
+const tags = extractTagsFromCollection(entries);
 ---
 <div class="h-72 -mb-56">
     <div class="navbar sticky px-0 top-0 h-16 bg-base-100/50 z-50">
@@ -17,7 +18,31 @@ const tags = extractTags(allImageModules);
             }
             </a>
         </div>
-        <div class="flex-none">
+        <div class="flex-none flex items-center gap-2">
+            {import.meta.env.DEV && (
+                <>
+                    <EditModeToggle />
+                    <EditModeOnly class="flex">
+                        <input
+                            id="upload-input"
+                            type="file"
+                            accept="image/*"
+                            multiple
+                            class="hidden"
+                        />
+                        <button
+                            id="upload-button"
+                            type="button"
+                            class="btn btn-sm btn-primary gap-2"
+                            data-current-tag={currentTag ?? ""}
+                        >
+                            <span class="text-xl leading-none">+</span>
+                            <span class="hidden md:inline">Upload</span>
+                        </button>
+                        <p id="upload-status" class="text-xs text-neutral-400 ml-2 hidden"></p>
+                    </EditModeOnly>
+                </>
+            )}
             <ul class="menu menu-horizontal px-0">
                 <li>
                     <details class="dropdown dropdown-end">
@@ -37,3 +62,61 @@ const tags = extractTags(allImageModules);
         </div>
     </div>
 </div>
+
+{import.meta.env.DEV && (
+    <script>
+        const button = document.getElementById("upload-button");
+        const input = document.getElementById("upload-input") as HTMLInputElement | null;
+        const status = document.getElementById("upload-status");
+
+        const setStatus = (text: string, visible = true) => {
+            if (!status) return;
+            status.textContent = text;
+            status.classList.toggle("hidden", !visible);
+        };
+
+        const openPicker = () => {
+            if (!input || !button) return;
+            input.value = "";
+            input.click();
+        };
+
+        const uploadFiles = async (files: FileList | null) => {
+            if (!files || files.length === 0 || !button) return;
+            const tag = button.getAttribute("data-current-tag") ?? "";
+            const uploads = Array.from(files);
+
+            button.setAttribute("disabled", "true");
+            setStatus("Uploading...", true);
+
+            try {
+                for (const file of uploads) {
+                    const formData = new FormData();
+                    formData.append("file", file);
+                    if (tag) formData.append("tag", tag);
+
+                    const res = await fetch("/api/upload/", {
+                        method: "POST",
+                        body: formData,
+                    });
+
+                    if (!res.ok) {
+                        const message = await res.text();
+                        throw new Error(message || "Upload failed");
+                    }
+                }
+
+                setStatus("Upload complete. Rebuild to see new images.");
+            } catch (err) {
+                console.error(err);
+                setStatus(`Error: ${err instanceof Error ? err.message : "upload failed"}`);
+            } finally {
+                button.removeAttribute("disabled");
+                if (input) input.value = "";
+            }
+        };
+
+        button?.addEventListener("click", openPicker);
+        input?.addEventListener("change", () => uploadFiles(input.files));
+    </script>
+)}

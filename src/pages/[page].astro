@@ -1,12 +1,12 @@
 ---
 import Gallery from "../components/Gallery.astro";
 import GalleryLayout from "../layouts/GalleryLayout.astro";
-import { processImages } from "../utils/imageLoader.ts";
+import { getCollection } from "astro:content";
+import { processImagesFromCollection } from "../utils/imageLoader.ts";
 
 export async function getStaticPaths({ paginate }: { paginate: any }) {
-	const allImageModules = import.meta.glob("../assets/images/**/*.{jpeg,jpg,png,webp}", { eager: true });
-	const allImages = await processImages(allImageModules);
-	
+	const entries = await getCollection("images");
+	const allImages = await processImagesFromCollection(entries);
 	return paginate(
 		allImages,
 		{pageSize: import.meta.env.PUBLIC_IMAGES_PER_PAGE});
