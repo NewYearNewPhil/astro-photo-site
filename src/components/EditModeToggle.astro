@@ -1,0 +1,126 @@
+---
+if (!import.meta.env.DEV) {
+  return null;
+}
+
+const toggleId = Astro.props?.id ?? "edit-mode-toggle";
+const label = Astro.props?.label ?? "Edit Mode";
+---
+<button
+  id={toggleId}
+  type="button"
+  class="btn btn-sm"
+  data-edit-mode-toggle
+  data-edit-mode-toggle-id={toggleId}
+  data-edit-mode-label={label}
+>
+  <span>{label}</span>
+  <span class="badge" data-edit-mode-status>Off</span>
+</button>
+<script>
+  const root = document.documentElement;
+
+  const readPersisted = () => {
+    try {
+      return sessionStorage.getItem("edit-mode") === "on";
+    } catch (err) {
+      console.warn("edit-mode: unable to read session", err);
+      return undefined;
+    }
+  };
+
+  const writePersisted = (active: boolean) => {
+    try {
+      sessionStorage.setItem("edit-mode", active ? "on" : "off");
+    } catch (err) {
+      console.warn("edit-mode: unable to persist session", err);
+    }
+  };
+
+  const ensureDefault = () => {
+    if (!root.dataset.editMode) {
+      const persisted = readPersisted();
+      root.dataset.editMode = persisted === undefined ? "off" : (persisted ? "on" : "off");
+    }
+  };
+
+  const readState = () => root.dataset.editMode === "on";
+
+  function writeButton(button: HTMLButtonElement, active: boolean) {
+    button.setAttribute("aria-pressed", active ? "true" : "false");
+    button.classList.toggle("btn-primary", active);
+    const status = button.querySelector("[data-edit-mode-status]");
+    if (status instanceof HTMLElement) {
+      status.textContent = active ? "On" : "Off";
+    }
+  }
+
+  function setState(active: boolean) {
+  root.dataset.editMode = active ? "on" : "off";
+  writePersisted(active);
+    root.dispatchEvent(
+      new CustomEvent("editmodechange", { detail: { active } }),
+    );
+  }
+
+  const updateAll = () => {
+    const active = readState();
+    document.querySelectorAll("[data-edit-mode-toggle]").forEach((node) => {
+      if (node instanceof HTMLButtonElement) {
+        writeButton(node, active);
+      }
+    });
+  };
+
+  function handleClick(event: MouseEvent) {
+    const target = event.currentTarget;
+    if (!(target instanceof HTMLButtonElement)) {
+      return;
+    }
+    event.preventDefault();
+    const next = !readState();
+    setState(next);
+    updateAll();
+  }
+
+  const bind = () => {
+    ensureDefault();
+    document.querySelectorAll("[data-edit-mode-toggle]").forEach((node) => {
+      if (!(node instanceof HTMLButtonElement)) {
+        return;
+      }
+      if (node.dataset.editModeBound === "yes") {
+        writeButton(node, readState());
+        return;
+      }
+      node.dataset.editModeBound = "yes";
+      node.addEventListener("click", handleClick);
+      writeButton(node, readState());
+    });
+  };
+
+  const handleExternalChange = () => {
+    updateAll();
+  };
+
+  root.addEventListener("editmodechange", handleExternalChange);
+  window.addEventListener("astro:after-swap", () => {
+    bind();
+    updateAll();
+  });
+  window.addEventListener("astro:page-load", () => {
+    bind();
+    updateAll();
+  });
+  window.addEventListener("pageshow", () => {
+    bind();
+    updateAll();
+  });
+  window.addEventListener("popstate", () => {
+    bind();
+    updateAll();
+  });
+
+  bind();
+  updateAll();
+</script>

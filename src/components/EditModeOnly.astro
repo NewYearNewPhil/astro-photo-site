@@ -1,0 +1,78 @@
+---
+if (!import.meta.env.DEV) {
+  return null;
+}
+
+const {
+  class: className = "",
+  id,
+  ...rest
+} = Astro.props ?? {};
+
+const fallbackId = `edit-only-${Math.random().toString(36).slice(2, 10)}`;
+const elementId = id ?? fallbackId;
+---
+<div
+  {...rest}
+  id={elementId}
+  class={`edit-mode-only ${className}`.trim()}
+  data-edit-only
+  hidden
+>
+  <slot />
+</div>
+<script>
+  const root = document.documentElement;
+
+  const readPersisted = () => {
+    try {
+      return sessionStorage.getItem("edit-mode") === "on";
+    } catch (err) {
+      console.warn("edit-mode: unable to read session", err);
+      return undefined;
+    }
+  };
+
+  const readState = () => {
+    if (root.dataset.editMode) {
+      return root.dataset.editMode === "on";
+    }
+    const persisted = readPersisted();
+    return persisted === undefined ? false : persisted;
+  };
+
+  const apply = (element: Element) => {
+    if (!(element instanceof HTMLElement)) {
+      return;
+    }
+    const active = readState();
+    element.hidden = !active;
+    if (active) {
+      element.setAttribute("data-edit-mode-active", "on");
+    } else {
+      element.removeAttribute("data-edit-mode-active");
+    }
+  };
+
+  const applyAll = () => {
+    document.querySelectorAll("[data-edit-only]").forEach((node) => {
+      apply(node);
+    });
+  };
+
+  const handleChange = () => {
+    applyAll();
+  };
+
+  root.addEventListener("editmodechange", handleChange);
+  window.addEventListener("astro:page-load", handleChange);
+  window.addEventListener("astro:after-swap", handleChange);
+  window.addEventListener("pageshow", handleChange);
+  window.addEventListener("popstate", handleChange);
+
+  if (!root.dataset.editMode) {
+    root.dataset.editMode = "off";
+  }
+
+  applyAll();
+</script>

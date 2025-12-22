@@ -8,8 +8,7 @@
     "build": "astro check && astro build",
     "preview": "astro preview",
     "yo": "astro build && astro preview --host",
-    "astro": "astro",
-    "generate": "node generate_image_markdown.js"
+    "generate": "tsx src/utils/edit-mode/generateContentFromAssets.ts"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.6",
@@ -20,6 +19,7 @@
     "typescript": "^5.4.5"
   },
   "devDependencies": {
-    "daisyui": "^4.11.1"
+    "daisyui": "^4.11.1",
+    "tsx": "^4.7.0"
   }
 }

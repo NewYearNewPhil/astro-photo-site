@@ -17,5 +17,6 @@ export default defineConfig({
   },
   integrations: [tailwind({
     applyBaseStyles: false
-  })]
+  })],
+  output: 'static',
 });
